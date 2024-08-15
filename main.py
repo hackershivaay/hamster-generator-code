@@ -18,14 +18,17 @@ bru = Fore.LIGHTBLUE_EX
 reset = Style.RESET_ALL
 htm = Fore.LIGHTBLACK_EX
 
-EVENTS_DELAY = 20000 / 1000 
+EVENTS_DELAY = 20000 / 1000
+
 
 def load_config():
     with open('config.json', 'r') as file:
         return json.load(file)
 
+
 config = load_config()
 games = config['games']
+
 
 def load_proxies():
     proxies = []
@@ -38,6 +41,7 @@ def load_proxies():
             print("proxies.txt not found")
     return proxies
 
+
 def parse_proxy(proxy_string):
     proxy_parts = proxy_string.split('@')
     auth = proxy_parts[0].split(':')
@@ -47,10 +51,12 @@ def parse_proxy(proxy_string):
         'https': f"http://{auth[0]}:{auth[1]}@{host_port[0]}:{host_port[1]}"
     }
 
+
 def get_proxy(proxies):
     if proxies:
         return random.choice(proxies)
     return None
+
 
 def _banner():
     banner = r"""
@@ -59,17 +65,20 @@ def _banner():
  ██║   ██║   ███████╗     ██║███████║██║ █╗ ██║
  ██║   ██║   ╚════██║██   ██║██╔══██║██║███╗██║
  ██║   ██║   ███████║╚█████╔╝██║  ██║╚███╔███╔╝
- ╚═╝   ╚═╝   ╚══════╝ ╚════╝ ╚═╝  ╚═╝ ╚══╝╚══╝  """ 
+ ╚═╝   ╚═╝   ╚══════╝ ╚════╝ ╚═╝  ╚═╝ ╚══╝╚══╝  """
     print(Fore.GREEN + Style.BRIGHT + banner + Style.RESET_ALL)
     print(hju + f" Hamster Promo Code Generator")
     print(mrh + f" NOT FOR SALE = Free to use")
     print(mrh + f" before start please '{hju}git pull{mrh}' to update bot\n")
 
+
 def _clear():
     os.system('cls' if os.name == 'nt' else 'clear')
 
+
 def log_line():
     print(pth + "~" * 60)
+
 
 def countdown_timer(seconds):
     while seconds:
@@ -83,13 +92,16 @@ def countdown_timer(seconds):
         time.sleep(1)
     print(f"{pth}please wait until {h}:{m}:{s} ", flush=True, end="\r")
 
+
 def generate_client_id():
     timestamp = int(time.time() * 1000)
     random_numbers = ''.join([str(random.randint(0, 9)) for _ in range(19)])
     return f"{timestamp}-{random_numbers}"
 
+
 def generate_uuid():
     return str(uuid.uuid4())
+
 
 async def login(client_id, app_token, proxies=None):
     response = requests.post('https://api.gamepromo.io/promo/login-client', json={
@@ -103,6 +115,7 @@ async def login(client_id, app_token, proxies=None):
 
     data = response.json()
     return data['clientToken']
+
 
 async def emulate_progress(client_token, promo_id, proxies=None):
     response = requests.post('https://api.gamepromo.io/promo/register-event', headers={
@@ -120,6 +133,7 @@ async def emulate_progress(client_token, promo_id, proxies=None):
     data = response.json()
     return data['hasCode']
 
+
 async def generate_key(client_token, promo_id, proxies=None):
     response = requests.post('https://api.gamepromo.io/promo/create-code', headers={
         'Authorization': f'Bearer {client_token}',
@@ -134,19 +148,23 @@ async def generate_key(client_token, promo_id, proxies=None):
     data = response.json()
     return data['promoCode']
 
+
 def sleep(ms):
     time.sleep(ms / 1000)
 
+
 def delay_random():
     return random.random() / 3 + 1
+
 
 def print_progress(iteration, total, prefix='', suffix='', decimals=1, length=35, fill='█'):
     percent = ("{0:." + str(decimals) + "f}").format(100 * (iteration / float(total)))
     filled_length = int(length * iteration // total)
     bar = fill * filled_length + '-' * (length - filled_length)
     print(hju + f'\r{prefix} |{pth}{bar}{hju}| {pth}{percent}{bru}% {hju}{suffix}', end='\r')
-    if iteration == total: 
+    if iteration == total:
         print()
+
 
 async def generate_key_process(game, key_count, proxies):
     client_id = generate_client_id()
@@ -171,6 +189,7 @@ async def generate_key_process(game, key_count, proxies):
         print(f"Failed to generate key: {error}")
         return None
 
+
 async def main():
     _clear()
     _banner()
@@ -194,6 +213,7 @@ async def main():
 
             print(hju + f"Generated {pth}{len(keys)} promo code's for {kng}{game['name']}. {hju}Sleeping...        ")
             countdown_timer(10)
+
 
 if __name__ == "__main__":
     while True:
