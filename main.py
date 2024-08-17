@@ -1,4 +1,5 @@
 import asyncio
+import aiohttp
 import requests
 import uuid
 import os
@@ -15,7 +16,7 @@ from colorama import init, Fore, Style
 init(autoreset=True)
 
 # Конфигурация для базы данных
-DATABASE_URL = 'mysql+pymysql://root:123123@localhost/123123'
+DATABASE_URL = os.getenv('DATABASE_URL')
 Base = declarative_base()
 engine = create_engine(DATABASE_URL)
 Session = sessionmaker(bind=engine)
@@ -42,8 +43,12 @@ reset = Style.RESET_ALL
 EVENTS_DELAY = 20000 / 1000
 
 def load_config():
-    with open('config.json', 'r') as file:
-        return json.load(file)
+    try:
+        with open('config.json', 'r') as file:
+            return json.load(file)
+    except FileNotFoundError:
+        logging.error("Config file not found.")
+        sys.exit(1)
 
 config = load_config()
 games = config['games']
@@ -60,18 +65,20 @@ def load_proxies():
     return proxies
 
 def parse_proxy(proxy_string):
-    proxy_parts = proxy_string.split('@')
-    auth = proxy_parts[0].split(':')
-    host_port = proxy_parts[1].split(':')
-    return {
-        'http': f"http://{auth[0]}:{auth[1]}@{host_port[0]}:{host_port[1]}",
-        'https': f"http://{auth[0]}:{auth[1]}@{host_port[0]}:{host_port[1]}"
-    }
+    try:
+        proxy_parts = proxy_string.split('@')
+        auth = proxy_parts[0].split(':')
+        host_port = proxy_parts[1].split(':')
+        return {
+            'http': f"http://{auth[0]}:{auth[1]}@{host_port[0]}:{host_port[1]}",
+            'https': f"http://{auth[0]}:{auth[1]}@{host_port[0]}:{host_port[1]}"
+        }
+    except (IndexError, ValueError):
+        logging.error(f"Invalid proxy format: {proxy_string}")
+        return None
 
 def get_proxy(proxies):
-    if proxies:
-        return random.choice(proxies)
-    return None
+        return random.choice(proxies) if proxies else None
 
 def _banner():
     banner = r"""
@@ -113,17 +120,22 @@ def generate_uuid():
     return str(uuid.uuid4())
 
 async def login(client_id, app_token, proxies=None):
-    response = requests.post('https://api.gamepromo.io/promo/login-client', json={
-        'appToken': app_token,
-        'clientId': client_id,
-        'clientOrigin': 'deviceid'
-    }, proxies=proxies)
-
-    if response.status_code != 200:
-        raise Exception('Failed to login')
-
-    data = response.json()
-    return data['clientToken']
+    proxy = get_proxy(proxies)
+    async with aiohttp.ClientSession() as session:
+        try:
+            async with session.post('https://api.gamepromo.io/promo/login-client',
+                                    json={
+                                        'appToken': app_token,
+                                        'clientId': client_id,
+                                        'clientOrigin': 'deviceid'
+                                    },
+                                    proxy=proxy) as response:
+                response.raise_for_status()
+                data = await response.json()
+                return data.get('clientToken')
+        except aiohttp.ClientError as e:
+            logging.error(f"(Login failed: {e}")
+            return None
 
 async def emulate_progress(client_token, promo_id, proxies=None):
     response = requests.post('https://api.gamepromo.io/promo/register-event', headers={
