@@ -1,3 +1,6 @@
 asyncio
 requests
 colorama
+sqlalchemy
+pymysql
+aiohttp
