@@ -6,19 +6,40 @@ import sys
 import time
 import random
 import json
-from colorama import *
+import logging
+from sqlalchemy import create_engine, Column, Integer, String
+from sqlalchemy.orm import sessionmaker, declarative_base
+from colorama import init, Fore, Style
 
+# Инициализация colorama
 init(autoreset=True)
 
+# Конфигурация для базы данных
+DATABASE_URL = 'mysql+pymysql://root:123123@localhost/123123'
+Base = declarative_base()
+engine = create_engine(DATABASE_URL)
+Session = sessionmaker(bind=engine)
+session = Session()
+
+class Record(Base):
+    __tablename__ = 'records'
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, nullable=True)
+    content = Column(String(255))
+    date_sent = Column(String(10), nullable=True)
+
+Base.metadata.create_all(engine)
+
+# Настройка логирования
+logging.basicConfig(level=logging.INFO)
+
+# Цвета для вывода
 mrh = Fore.LIGHTRED_EX
 pth = Fore.LIGHTWHITE_EX
 hju = Fore.LIGHTGREEN_EX
-kng = Fore.LIGHTYELLOW_EX
-bru = Fore.LIGHTBLUE_EX
 reset = Style.RESET_ALL
-htm = Fore.LIGHTBLACK_EX
 
-EVENTS_DELAY = 20000 / 1000 
+EVENTS_DELAY = 20000 / 1000
 
 def load_config():
     with open('config.json', 'r') as file:
@@ -59,7 +80,7 @@ def _banner():
  ██║   ██║   ███████╗     ██║███████║██║ █╗ ██║
  ██║   ██║   ╚════██║██   ██║██╔══██║██║███╗██║
  ██║   ██║   ███████║╚█████╔╝██║  ██║╚███╔███╔╝
- ╚═╝   ╚═╝   ╚══════╝ ╚════╝ ╚═╝  ╚═╝ ╚══╝╚══╝  """ 
+ ╚═╝   ╚═╝   ╚══════╝ ╚════╝ ╚═╝  ╚═╝ ╚══╝╚══╝  """
     print(Fore.GREEN + Style.BRIGHT + banner + Style.RESET_ALL)
     print(hju + f" Hamster Promo Code Generator")
     print(mrh + f" NOT FOR SALE = Free to use")
@@ -134,19 +155,22 @@ async def generate_key(client_token, promo_id, proxies=None):
     data = response.json()
     return data['promoCode']
 
-def sleep(ms):
-    time.sleep(ms / 1000)
-
 def delay_random():
     return random.random() / 3 + 1
 
-def print_progress(iteration, total, prefix='', suffix='', decimals=1, length=35, fill='█'):
-    percent = ("{0:." + str(decimals) + "f}").format(100 * (iteration / float(total)))
-    filled_length = int(length * iteration // total)
-    bar = fill * filled_length + '-' * (length - filled_length)
-    print(hju + f'\r{prefix} |{pth}{bar}{hju}| {pth}{percent}{bru}% {hju}{suffix}', end='\r')
-    if iteration == total: 
-        print()
+def insert_tokens_to_db(tokens):
+    unique_tokens = {token for token in tokens if token}
+
+    with Session() as session:
+        new_records = [Record(content=token) for token in unique_tokens if session.query(Record).filter_by(content=token).count() == 0]
+        session.bulk_save_objects(new_records)
+        session.commit()
+    logging.info(f"Inserted {len(new_records)} unique tokens into the database.")
+
+def save_tokens_to_file(tokens, file_path='promo.txt'):
+    with open(file_path, 'a') as file:
+        for token in tokens:
+            file.write(f"{token}\n")
 
 async def generate_key_process(game, key_count, proxies):
     client_id = generate_client_id()
@@ -160,7 +184,6 @@ async def generate_key_process(game, key_count, proxies):
     for i in range(11):
         await asyncio.sleep(EVENTS_DELAY * delay_random())
         has_code = await emulate_progress(client_token, game['promoId'], proxies)
-        print_progress(i + 1, 11, prefix='Progress:', suffix='Complete', length=35)
         if has_code:
             break
 
@@ -175,30 +198,30 @@ async def main():
     _clear()
     _banner()
     log_line()
+    game_choice = random.randint(1, 6)
+    key_count = config.get('key_count', 1)
+    game = games[str(game_choice)]
     proxies = load_proxies()
 
     while True:
-        available_games = list(games.values())
-        sample_size = min(10, len(available_games))
-        random_games = random.sample(available_games, sample_size)
+        proxy = get_proxy(proxies)
+        keys = await asyncio.gather(*[generate_key_process(game, key_count, proxy) for _ in range(key_count)])
+        keys = list(filter(None, keys))
 
-        for game in random_games:
-            print(hju + f"Generating {kng}{game['name']} {hju}promo codes...")
-            keys = await asyncio.gather(*[generate_key_process(game, 1, get_proxy(proxies)) for _ in range(10)])
-            keys = list(filter(None, keys))
+        if keys:
+            if config.get('save_to_db', False):
+                insert_tokens_to_db(keys)
+            else:
+                save_tokens_to_file(keys)
 
-            if keys:
-                with open('promo.txt', 'a') as file:
-                    for key in keys:
-                        file.write(f"{key}\n")
-
-            print(hju + f"Generated {pth}{len(keys)} promo code's for {kng}{game['name']}. {hju}Sleeping...        ")
-            countdown_timer(10)
+        print(hju + f"Generated {pth}{len(keys)} promo code's. {hju}Sleeping for a bit before generating more...      ")
+        game_choice = random.randint(1, 6)
+        game = games[str(game_choice)]
+        countdown_timer(600)
 
 if __name__ == "__main__":
-    while True:
-        try:
-            asyncio.run(main())
-        except KeyboardInterrupt:
-            print(mrh + f"\rSuccessfully logged out of the bot\n")
-            sys.exit()
+    try:
+        asyncio.run(main())
+    except KeyboardInterrupt:
+        print(mrh + f"\rSuccessfully logged out of the bot\n")
+        sys.exit()
