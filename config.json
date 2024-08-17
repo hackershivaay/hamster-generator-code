@@ -2,7 +2,7 @@
     "game_choice": 1,
     "key_count": 4,
     "use_proxies": false,
-    "save_to_db": true,
+    "save_to_db": false,
     "games": {
         "1": {
             "name": "Riding Extreme 3D",
