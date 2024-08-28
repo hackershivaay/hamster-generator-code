@@ -3,7 +3,7 @@
     "countdown_delay": 11,
     "use_proxies": false,
     "random_selection": true,
-    "selected_games": ["2","6"],
+    "selected_games": ["9"],
     "games": {
         "1": {
             "name": "Riding Extreme 3D",
@@ -47,8 +47,8 @@
         },
         "9": {
             "name": "Cafe Dash",
-            "appToken": "c0971b8-04df-4e72-8a3e-ec4dc663cd11",
-            "promoId": "c0971b8-04df-4e72-8a3e-ec4dc663cd11"
+            "appToken": "bc0971b8-04df-4e72-8a3e-ec4dc663cd11",
+            "promoId": "bc0971b8-04df-4e72-8a3e-ec4dc663cd11"
         }
     }
 }
