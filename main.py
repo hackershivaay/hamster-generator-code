@@ -4,6 +4,7 @@ import uuid
 import os
 import sys
 import time
+import re
 import random
 import json
 from colorama import *
@@ -17,8 +18,6 @@ kng = Fore.LIGHTYELLOW_EX
 bru = Fore.LIGHTBLUE_EX
 reset = Style.RESET_ALL
 htm = Fore.LIGHTBLACK_EX
-
-EVENTS_DELAY = 20000 / 1000 
 
 def load_config():
     with open('config.json', 'r') as file:
@@ -136,7 +135,7 @@ async def generate_key(client_token, promo_id, proxies=None):
     }, proxies=proxies)
 
     if response.status_code != 200:
-        raise Exception('Failed to generate key')
+        raise Exception(mrh + f'Failed to generate key')
 
     data = response.json()
     return data['promoCode']
@@ -158,14 +157,21 @@ def print_progress(iteration, total, prefix='', suffix='', decimals=1, length=35
 async def generate_key_process(game, key_count, proxies):
     client_id = generate_client_id()
     client_token = None
+    event_delay = game.get('event_delay', 31)  
+
     try:
         client_token = await login(client_id, game['appToken'], proxies)
     except Exception as error:
-        print(mrh + f"Failed to login: {error}")
+        error_message = str(error)
+        match = re.search(r"\d{3} [A-Za-z ]+", error_message)
+        if match:
+            print(mrh + f"Failed to login: {match.group(0)}")
+        else:
+            print(mrh + f"Failed to login: {error_message}")
         return None
 
     for i in range(11):
-        await asyncio.sleep(EVENTS_DELAY * delay_random())
+        await asyncio.sleep(event_delay * delay_random())
         has_code = await emulate_progress(client_token, game['promoId'], proxies)
         print_progress(i + 1, 11, prefix='Progress:', suffix='Complete', length=35)
         if has_code:
@@ -175,11 +181,13 @@ async def generate_key_process(game, key_count, proxies):
         key = await generate_key(client_token, game['promoId'], proxies)
         return key
     except Exception as error:
-        print(f"Failed to generate key: {error}")
+        error_message = str(error)
+        match = re.search(r"\d{3} [A-Za-z ]+", error_message)
+        if match:
+            print(mrh + f"Failed to generate key: {match.group(0)}")
+        else:
+            print(f"Failed to generate key: {error_message}")
         return None
-
-import random
-import asyncio
 
 async def main():
     _clear()

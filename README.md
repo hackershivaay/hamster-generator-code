@@ -14,11 +14,11 @@ TDTtTc4hSnK9ii1VDudZij8FVK2ZtwChja - TRON
 UQBy7ICXV6qFGeFTRWSpnMtoH6agYF3PRa5nufcTr3GVOPri - TON
 ```
 
-## Summary ( Latest Update on 08 - 18 - 2024 )
+## Summary ( Latest Update on 09 - 07 - 2024 )
 
+- Give a Small Update
+- Add New Game Promo ID
 - Fix Random Game Selection
-- Add Multiple Game Selection
-- Add Proxy Sock5 Support
 
 ***if `"random_selection": false`, will choose game from `"selected_games": ["2","6"]`, you can add more selections by adding more number. example : `"selected_games": ["2","6","3"]`***
 
@@ -66,41 +66,77 @@ This file should be located in the root directory of the project. Here is a samp
 
 ```json
 {
-    "key_count": 11,
+    "key_count": 8,
     "countdown_delay": 11,
     "use_proxies": false,
-    "random_selection": true,
-    "selected_games": ["2","6"],
+    "random_selection": false,
+    "selected_games": ["8"],
     "games": {
         "1": {
-            "name": "Riding Extreme 3D",
-            "appToken": "d28721be-fd2d-4b45-869e-9f253b554e50",
-            "promoId": "43e35910-c168-4634-ad4f-52fd764a843f"
-        },
-        "2": {
             "name": "Chain Cube 2048",
             "appToken": "d1690a07-3780-4068-810f-9b5bbf2931b2",
-            "promoId": "b4170868-cef0-424f-8eb9-be0622e8e8e3"
+            "promoId": "b4170868-cef0-424f-8eb9-be0622e8e8e3",
+            "event_delay": 21
         },
-        "3": {
+        "2": {
             "name": "My Clone Army",
             "appToken": "74ee0b5b-775e-4bee-974f-63e7f4d5bacb",
-            "promoId": "fe693b26-b342-4159-8808-15e3ff7f8767"
+            "promoId": "fe693b26-b342-4159-8808-15e3ff7f8767",
+            "event_delay": 21
         },
-        "4": {
+        "3": {
             "name": "Train Miner",
             "appToken": "82647f43-3f87-402d-88dd-09a90025313f",
-            "promoId": "c4480ac7-e178-4973-8061-9ed5b2e17954"
+            "promoId": "c4480ac7-e178-4973-8061-9ed5b2e17954",
+            "event_delay": 21
         },
-        "5": {
+        "4": {
             "name": "MergeAway",
             "appToken": "8d1cc2ad-e097-4b86-90ef-7a27e19fb833",
-            "promoId": "dc128d28-c45b-411c-98ff-ac7726fbaea4"
+            "promoId": "dc128d28-c45b-411c-98ff-ac7726fbaea4",
+            "event_delay": 21
         },
-        "6": {
+        "5": {
             "name": "Twerk Race 3D",
             "appToken": "61308365-9d16-4040-8bb0-2f4a4c69074c",
-            "promoId": "61308365-9d16-4040-8bb0-2f4a4c69074c"
+            "promoId": "61308365-9d16-4040-8bb0-2f4a4c69074c",
+            "event_delay": 21
+        },
+        "6": {
+            "name": "POLY",
+            "appToken": "2aaf5aee-2cbc-47ec-8a3f-0962cc14bc71",
+            "promoId": "2aaf5aee-2cbc-47ec-8a3f-0962cc14bc71",
+            "event_delay": 31
+        },
+        "7": {
+            "name": "TRIM",
+            "appToken": "ef319a80-949a-492e-8ee0-424fb5fc20a6",
+            "promoId": "ef319a80-949a-492e-8ee0-424fb5fc20a6",
+            "event_delay": 31
+        },
+        "8": {
+            "name": "Zoopolis",
+            "appToken": "b2436c89-e0aa-4aed-8046-9b0515e1c46b",
+            "promoId": "b2436c89-e0aa-4aed-8046-9b0515e1c46b",
+            "event_delay": 21
+        },
+        "9": {
+            "name": "Fluff Crusade",
+            "appToken": "112887b0-a8af-4eb2-ac63-d82df78283d9",
+            "promoId": "112887b0-a8af-4eb2-ac63-d82df78283d9",
+            "event_delay": 31
+        },
+        "10": {
+            "name": "Tile Trio",
+            "appToken": "e68b39d2-4880-4a31-b3aa-0393e7df10c7",
+            "promoId": "e68b39d2-4880-4a31-b3aa-0393e7df10c7",
+            "event_delay": 31
+        },
+        "11": {
+            "name": "Stone Age",
+            "appToken": "04ebd6de-69b7-43d1-9c4b-04a6ca3305af",
+            "promoId": "04ebd6de-69b7-43d1-9c4b-04a6ca3305af",
+            "event_delay": 31
         }
     }
 }
