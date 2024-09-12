@@ -1,5 +1,5 @@
 {
-    "key_count": 8,
+    "key_count": 10,
     "countdown_delay": 11,
     "use_proxies": false,
     "random_selection": false,
@@ -12,9 +12,9 @@
             "event_delay": 21
         },
         "2": {
-            "name": "My Clone Army",
-            "appToken": "74ee0b5b-775e-4bee-974f-63e7f4d5bacb",
-            "promoId": "fe693b26-b342-4159-8808-15e3ff7f8767",
+            "name": "Bouncemasters",
+            "appToken": "bc72d3b9-8e91-4884-9c33-f72482f0db37",
+            "promoId": "bc72d3b9-8e91-4884-9c33-f72482f0db37",
             "event_delay": 21
         },
         "3": {
