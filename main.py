@@ -7,6 +7,7 @@ import time
 import re
 import random
 import json
+from flask import Flask
 from colorama import *
 
 init(autoreset=True)
@@ -18,6 +19,17 @@ kng = Fore.LIGHTYELLOW_EX
 bru = Fore.LIGHTBLUE_EX
 reset = Style.RESET_ALL
 htm = Fore.LIGHTBLACK_EX
+
+app = Flask(__name__)
+
+@app.route('/')
+def home():
+    return "Hello, Hamster Generator!"
+
+if __name__ == "__main__":
+    # Use the PORT environment variable provided by Render
+    port = int(os.environ.get("PORT", 9556))
+    app.run(host="0.0.0.0", port=port)
 
 def load_config():
     with open('config.json', 'r') as file:
