@@ -1,3 +1,8 @@
 asyncio
 requests
 colorama
+Flask==2.3.2
+gunicorn==21.2.0
+fastapi==0.95.0
+uvicorn==0.22.0
+requests==2.31.0 
